@@ -10,10 +10,13 @@ app = Flask(__name__)
 def home():
     return render_template('home.html')
 
-
+@app.route('/directory/')
+def directory():
+    verb_list = directory_service.get_verb_list()
+    return render_template('directory.html', verb_list=verb_list)
 
 @app.route('/directory/<verb>')
-def hello(verb=None):
+def verb_entry(verb=None):
     if not verb:
         return redirect(url_for('/'))
 

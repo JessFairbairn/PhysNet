@@ -6,3 +6,8 @@ def get_verb(verb:str):
         
         return directory.get(verb)
         
+def get_verb_list():
+    with open("web/static/results.json", "r") as tempFile:
+        directory = json.load(tempFile)
+        
+        return [verb for verb in directory]
