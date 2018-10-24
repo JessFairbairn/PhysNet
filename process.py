@@ -108,5 +108,5 @@ for verb in verb_examples:
         print('Missing: ', stemmed_verb)
         continue
 
-with open("results.json", "w") as tempFile:
+with open("web/static/results.json", "w") as tempFile:
     json.dump(new_dict, tempFile, default=lambda o: o.__dict__)
