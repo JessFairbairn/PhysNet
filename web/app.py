@@ -8,7 +8,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return redirect(url_for('directory'))
+    # return render_template('home.html')
 
 @app.route('/directory/')
 def directory():
@@ -16,9 +17,7 @@ def directory():
     return render_template('directory.html', verb_list=verb_list)
 
 @app.route('/directory/<verb>')
-def verb_entry(verb=None):
-    if not verb:
-        return redirect(url_for('/'))
+def verb_entry(verb:str):
 
     verb_info = directory_service.get_verb(verb)
     if not verb_info:
