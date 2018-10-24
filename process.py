@@ -83,7 +83,7 @@ for file in files_in_dir:
                 try:
                     (stemmed_verb_instances[stemmed]).add(verb_tag[0].lower())
                 except KeyError:
-                    stemmed_verb_instances[stemmed] = set(verb_tag[0].lower())
+                    stemmed_verb_instances[stemmed] = set([verb_tag[0].lower()])
 
             verb_examples.update(dict(local_verb_examples))
     i += 1
