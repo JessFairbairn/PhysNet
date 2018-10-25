@@ -11,11 +11,13 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 from nltk.stem import WordNetLemmatizer
 
+import spacy
 
 class Processor:
 
     def __init__(self):        
         self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
+        self.spacy = spacy.load('en_core_web_md')
 
     def run(self):
         weights_df = self._extract_word_values()
@@ -65,6 +67,8 @@ class Processor:
 
     def _extract_verbs_from_documents(self):
         'Performs POS tagging to identify verbs, and extract an example sentence for each'
+        
+
         verb_examples = dict()  # Type:dict[string, str]
         stemmed_verb_instances = dict()  # Type:dict[string, set]
 
@@ -91,21 +95,19 @@ class Processor:
 
                 for sentence in clean_sentences:
                     
-                    pos_tags = self._pos_tag(sentence)
+                    list_of_verbs = self._list_verbs(sentence)
 
-                    verbs_tags = list(
-                        filter(lambda tuple: tuple[1].startswith('VB'), pos_tags))
                     local_verb_examples = dict(
-                        (self.stemmer.stem(verb_tag[0]).lower(), sentence) for verb_tag in verbs_tags)
+                        (self.stemmer.stem(verb).lower(), sentence) for verb in list_of_verbs)
 
-                    for verb_tag in verbs_tags:
-                        stemmed = self.stemmer.stem(verb_tag[0]).lower()
+                    for verb in list_of_verbs:
+                        stemmed = self.stemmer.stem(verb).lower()
                         try:
                             (stemmed_verb_instances[stemmed]).add(
-                                verb_tag[0].lower())
+                                verb.lower())
                         except KeyError:
                             stemmed_verb_instances[stemmed] = set(
-                                [verb_tag[0].lower()])
+                                [verb.lower()])
 
                     verb_examples.update(dict(local_verb_examples))
             i += 1
@@ -113,10 +115,18 @@ class Processor:
 
         return stemmed_verb_instances, verb_examples
 
-    def _pos_tag(self, sentence:str):
-        words = nltk.word_tokenize(sentence)
-        pos_tags = nltk.pos_tag(words)
-        return pos_tags
+    def _list_verbs(self, sentence:str):
+        # words = nltk.word_tokenize(sentence)
+        # pos_tags = nltk.pos_tag(words)
+        parsed = self.spacy(sentence)
+        pos_tags = list(map(lambda word: (word.text, word.pos_), parsed))
+
+        verb_list = list(
+            map(lambda tuple: tuple[0],
+                filter(lambda tuple: tuple[1] == 'VERB', pos_tags)
+            )
+        )
+        return verb_list
 
     def _save_results(self,
         stemmed_verb_instances: Dict[str, set],

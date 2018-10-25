@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from flask import abort, redirect, url_for
 
-import web.services.directory_service as directory_service
+import services.directory_service as directory_service
 
 app = Flask(__name__)
 
