@@ -17,7 +17,7 @@ class Processor:
 
     def __init__(self):        
         self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
-        self.spacy = spacy.load('en_core_web_md')
+        self.spacy = spacy.load('en_core_web_lg')
 
     def run(self):
         weights_df = self._extract_word_values()
