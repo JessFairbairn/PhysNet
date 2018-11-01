@@ -4,7 +4,7 @@ import os
 import typing
 
 # from classes.verb_definition import VerbDefinition
-from web.services.verb_definition import VerbDefinition
+from .verb_definition import VerbDefinition
 
 import condep.definitions.verbs as condep_verbs
 
