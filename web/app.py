@@ -1,7 +1,20 @@
+import os
+import sys
+
 from flask import Flask, render_template
 from flask import abort, redirect, url_for
 
+# Hack to import condep
+# TODO: add condep to pip
+dir_path = os.path.dirname(os.path.realpath(__file__))
+slash_positions = ([pos for pos, char in enumerate(dir_path) if char == '/'])
+sys.path.append(dir_path[0:slash_positions[-1]] + '/ConDep')
+
+# pylint: disable=E0401
+import condep
+
 import services.directory_service as directory_service
+
 
 app = Flask(__name__)
 

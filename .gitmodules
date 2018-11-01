@@ -1,0 +1,3 @@
+[submodule "ConDep"]
+	path = ConDep
+	url = https://github.com/JessFairbairn/ConDep

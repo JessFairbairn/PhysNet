@@ -10,3 +10,7 @@ Forms found:
   <li>{{form}}</li>
   {% endfor %}
 </ul>
+{% if data.condep %}
+<h2>Conceptual Dependancies</h2>
+{{data.condep.primitive.name}} Event
+{%endif%}
