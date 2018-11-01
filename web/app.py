@@ -13,7 +13,7 @@ sys.path.append(dir_path[0:slash_positions[-1]] + '/ConDep')
 # pylint: disable=E0401
 import condep
 
-import services.directory_service as directory_service
+from services import directory_service 
 
 
 app = Flask(__name__)
