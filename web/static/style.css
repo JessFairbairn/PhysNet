@@ -1,0 +1,59 @@
+/* Layout */
+
+html{
+    height:100%;
+    margin:0;
+}
+
+body {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    margin:0;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+h1{
+    margin: 10px 0;
+}
+
+header {
+    flex: 0 1 auto;
+}
+
+#content {
+    flex: 1 1 auto;
+}
+
+/* Color */
+
+*{color:#eee}
+
+a:hover{
+    color:lightseagreen;
+}
+
+*{background-color:#181818}
+
+table,td,tr,th{
+    border-color: #eee;
+    border-collapse: collapse;
+    padding:5px;
+}
+
+tr:nth-child(even) td{
+    background-color: #333;
+}
+
+tr.quarantined:nth-child(even) td{
+    background-color: rgb(49, 37, 31);
+}
+
+tr.quarantined:nth-child(odd) td{
+    background-color: rgb(41, 34, 31);
+}
+
+h1,h2,h3,th {
+    color:orangered
+}

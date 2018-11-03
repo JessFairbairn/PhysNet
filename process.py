@@ -5,13 +5,13 @@ from typing import Dict
 import nltk
 import numpy as np
 import pandas as pd
+import spacy
+from nltk.stem import WordNetLemmatizer
 from nltk.stem.snowball import SnowballStemmer
 from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
-from nltk.stem import WordNetLemmatizer
-
-import spacy
+import web.services.verbnet_service as verbnet_service
 
 class Processor:
 
@@ -101,6 +101,7 @@ class Processor:
                         (self.stemmer.stem(verb).lower(), sentence) for verb in list_of_verbs)
 
                     for verb in list_of_verbs:
+
                         stemmed = self.stemmer.stem(verb).lower()
                         try:
                             (stemmed_verb_instances[stemmed]).add(
@@ -126,6 +127,7 @@ class Processor:
                 filter(lambda tuple: tuple[1] == 'VERB', pos_tags)
             )
         )
+
         return verb_list
 
     def _save_results(self,
@@ -158,6 +160,10 @@ class Processor:
             
             except KeyError:
                 print('Missing: ', stemmed_verb)
+                continue
+
+            
+            if not verbnet_service.is_physics_verb(lemm):
                 continue
             
             new_dict[lemm] = {

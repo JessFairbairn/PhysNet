@@ -1,9 +1,13 @@
-<!doctype html>
-<title>Directory</title>
-<h1>Directory</h1>
+{% extends "_base.html" %}
+{% block title %}Directory{% endblock %}
+
+
+{% block content %}
 
 <ul>
   {% for verb in verb_list %}
   <li><a href="/directory/{{verb}}">{{verb}}</a></li>
   {% endfor %}
 </ul>
+
+{% endblock %}

@@ -1,6 +1,8 @@
-<!doctype html>
-<title>PhysNet: {{verb}}</title>
-<h1>{{verb}}</h1>
+{% extends "_base.html" %}
+{% block title %}{{verb}}{% endblock %}
+
+
+{% block content %}
 
 Example usage: 
 <blockquote>{{data.example}}</blockquote>
@@ -14,3 +16,5 @@ Forms found:
 <h2>Conceptual Dependancies</h2>
 {{data.condep.primitive.name}} Event
 {%endif%}
+
+{% endblock %}
