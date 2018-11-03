@@ -61,7 +61,7 @@ def _get_static_folder():
                 index = root.index('PhysNet')
                 if index > -1:
                         return '/'.join(root[0:index + 1]) + '/web/static'
-        except IndexError:
+        except ValueError:
 
                 pwd = os.path.dirname(os.path.realpath(__file__))
                 root = pwd.split('/')
