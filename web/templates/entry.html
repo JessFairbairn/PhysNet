@@ -15,6 +15,12 @@ Forms found:
 {% if data.condep %}
 <h2>Conceptual Dependancies</h2>
 {{data.condep.primitive.name}} Event
+<div id="condep-diagram">
+  <object data="/svg/{{verb}}" type="image/svg+xml">
+    
+  </object>
+</div>
+<!-- <script async="async" src="/static/js/entry.js"></script> -->
 {%endif%}
 
 {% endblock %}

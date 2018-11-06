@@ -1,0 +1,12 @@
+svg {
+    background-color:black;
+}
+
+svg text{
+    fill:#eee;
+}
+
+svg *:not(text){
+    stroke:white;
+    fill:white;
+}

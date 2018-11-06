@@ -13,7 +13,8 @@ sys.path.append(dir_path[0:slash_positions[-1]] + '/ConDep')
 # pylint: disable=E0401
 import condep
 
-from .services import directory_service 
+from .services import directory_service
+from .services import svg_service
 
 
 app = Flask(__name__)
@@ -36,6 +37,18 @@ def verb_entry(verb:str):
     if not verb_info:
         return abort(404)
     return render_template('entry.html', verb=verb, data=verb_info)
+
+@app.route('/svg/<verb>')
+def get_condep_diagram(verb:str):
+    if not svg_service.SVGService.diagram_exists(verb):
+        verb_info = directory_service.get_verb(verb)
+        
+        if not verb_info:
+            return abort(404)
+
+        svg_service.SVGService.create_diagram(verb, verb_info.condep)
+
+    return redirect(url_for('static', filename='cd-diagrams/'+ verb + '.svg'))
 
 if __name__ == "__main__":
     app.debug = True
