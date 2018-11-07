@@ -163,7 +163,7 @@ class SVGService:
             import cairo
         except Exception:
             print('Cario not installed- estimating text width', file=sys.stderr)
-            return len(text) * fontsize
+            return 0.7 * len(text) * fontsize
         surface = cairo.SVGSurface('undefined.svg', 1280, 200)
         cr = cairo.Context(surface)
         cr.select_font_face('Arial', cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
