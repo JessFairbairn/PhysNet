@@ -4,6 +4,10 @@ drafts/*
 verbnet/*
 text/*
 
+#generated files
+web/static/cd-diagrams/*.svg
+web/undefined.svg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
