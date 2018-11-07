@@ -57,22 +57,23 @@ class SVGService:
                             
         svg_document.add(actor_text)
 
-        width = SVGService.text_width("Subject", font_size)
+        actor_width = SVGService.text_width("Subject", font_size)
 
         # Add double arrow
         arrow_length = 60
 
-        SVGService._add_double_arrow(svg_document, (width+arrow_length+3,font_size/2 + 2), (width + 3, font_size/2 + 2))
+        SVGService._add_double_arrow(svg_document, (actor_width+arrow_length+3,font_size/2 + 2), (actor_width + 3, font_size/2 + 2))
 
         #Write Primitive
         prim_text = svg_document.text(cd.primitive.name,
-                            insert = (width + arrow_length + 6, font_size))
+                            insert = (actor_width + arrow_length + 6, font_size))
         
         svg_document.add(prim_text)
 
+        prim_width = SVGService.text_width(cd.primitive.name, font_size)
 
-        # svg_document.add(svg_document.text("Hello World",
-        #                                 insert = (210, 110)))
+
+        svg_document.attribs['width'] = f'{actor_width + arrow_length + prim_width + 8}px'
 
         svg_document.save()
 
