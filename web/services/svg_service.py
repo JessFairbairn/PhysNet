@@ -162,6 +162,7 @@ class SVGService:
         try:
             import cairo
         except Exception:
+            print('Cario not installed- estimating text width', file=sys.strerr)
             return len(text) * fontsize
         surface = cairo.SVGSurface('undefined.svg', 1280, 200)
         cr = cairo.Context(surface)
