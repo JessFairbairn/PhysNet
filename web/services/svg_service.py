@@ -7,8 +7,8 @@ import svgwrite
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 root = dir_path.split('/')
-index = root.index('PhysNet')
-sys.path.append('/'.join(root[0:index + 1]) + '/ConDep')
+index = root.index('web')
+sys.path.append('/'.join(root[0:index]) + '/ConDep')
 
 from condep.parsing.cd_definitions import CDDefinition
 from condep.primitives import Primitives
