@@ -41,11 +41,9 @@ class SVGService:
         except FileExistsError:
             pass
 
-        # font_size = 20
-
         svg_document = svgwrite.Drawing(
             filename=static_root + '/cd-diagrams/' + verb + ".svg",
-            size=("200px", f"{SVGService.font_size*2}px"))
+            size=("200px", f"{SVGService.FONT_SIZE*2}px"))
 
         svg_document.attribs['font-size'] = SVGService.FONT_SIZE
 
