@@ -20,7 +20,38 @@ Forms found:
     
   </object>
 </div>
-<!-- <script async="async" src="/static/js/entry.js"></script> -->
 {%endif%}
+
+<h2>Lexical Database Entries</h2>
+<dl>
+  {% if data.database_ids.verbnet %}
+  <dt>VerbNet ID</dt>
+  <dd>
+    <a href="https://verbs.colorado.edu/verb-index/vn3.3/vn/{{data.database_ids.verbnet}}.php">
+      {{data.database_ids.verbnet }}
+    </a>
+  </dd>
+  {%endif%}
+
+  {% if data.database_ids.propbank %}
+  <dt>Propbank Grouping</dt>
+  <dd>
+    <a href="http://verbs.colorado.edu/propbank/framesets-english-aliases/{{data.database_ids.propbank.split('.')[0]}}.html">
+      {{data.database_ids.propbank }}
+    </a>
+  </dd>
+  {%endif%}
+
+  {% if data.database_ids.wordnet %}
+  <dt>WordNet IDs</dt>
+  <dd>
+    <ul>
+      {% for sense in data.database_ids.wordnet %}
+      <li>{{sense}}</li>
+      {% endfor %}
+    </ul>
+  </dd>
+  {%endif%}
+</dl>
 
 {% endblock %}

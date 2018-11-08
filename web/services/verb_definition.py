@@ -11,3 +11,9 @@ class VerbDefinition:
     example = None
     instances = None # Type: List[str]
     condep = None #Type: CDDefinition
+    database_ids = None #Type: VerbData
+
+class VerbData:
+    propbank = None
+    wordnet = [] 
+    verbnet = None

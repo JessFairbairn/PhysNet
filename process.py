@@ -166,10 +166,13 @@ class Processor:
             if not verbnet_service.is_physics_verb(lemm):
                 continue
             
+            corpus_data = verbnet_service.get_corpus_ids(lemm)
+            
             new_dict[lemm] = {
                 'score': value,
                 'example': verb_examples[stemmed_verb],
-                'instances': list(stemmed_verb_instances[stemmed_verb])
+                'instances': list(stemmed_verb_instances[stemmed_verb]),
+                'database_ids': corpus_data
             }
 
         print('Saving file...')
