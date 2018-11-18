@@ -11,11 +11,12 @@ sys.path.append('/'.join(root[0:index + 1]) + '/ConDep')
 
 import ConDep.condep as condep
 import web.services.directory_service as directory_service
-from classes.verbs import VerbData
+from web.services.verb_definition import VerbData
 
 
 def is_physics_verb(verb:str):
     files_in_dir = os.listdir('verbnet')
+    found_in_verbnet = False
 
     for verb_file in files_in_dir:
         if not verb_file.endswith('.xml'):
@@ -30,15 +31,23 @@ def is_physics_verb(verb:str):
             found_subclass = root.find(f'SUBCLASSES/VNSUBCLASS/MEMBERS/MEMBER[@name="{verb}"]')
             if found_subclass is None:
                 continue
+            else:
+                found_in_verbnet = True
+        else:
+            found_in_verbnet = True
 
-        return _check_root_selrests
+        if _root_is_physics_sense(root):
+            return True
 
-    print(f'Verb "{verb}" not in VerbNet')
-    return True
+    if not found_in_verbnet:
+        print(f'Verb "{verb}" not in VerbNet')
+        return True
+    else:
+        return False
 
 
 def get_corpus_ids(verb:str):
-    data = VerbData()
+    senses = []
 
     files_in_dir = os.listdir('verbnet')
 
@@ -51,24 +60,32 @@ def get_corpus_ids(verb:str):
         found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
 
         #TODO: check selrests
-
+        data = VerbData()
         if found_verb is not None:
             data.verbnet = root.attrib['ID']
             data.propbank = found_verb.attrib['grouping']
             wordnet_codes = found_verb.attrib['wn']
-            data.wordnet = wordnet_codes.split(' ')
+            if wordnet_codes == '':
+                data.wordnet = []
+            else:
+                data.wordnet = wordnet_codes.split(' ')
+            senses.append(data)
         else:        
             found_subclass = root.find(f'SUBCLASSES/VNSUBCLASS/MEMBERS/MEMBER[@name="{verb}"]')
             if found_subclass is not None:
                 data.verbnet = root.attrib['ID']
                 data.propbank =  found_subclass.attrib['grouping']
                 wordnet_codes = found_subclass.attrib['wn']
-                data.wordnet = wordnet_codes.split(' ')
+                if wordnet_codes == '':
+                    data.wordnet = []
+                else:
+                    data.wordnet = wordnet_codes.split(' ')
+                senses.append(data)
 
-    return data
+    return senses
 
 
-def _check_root_selrests(root:ET.Element):
+def _root_is_physics_sense(root:ET.Element):
     sel_rests = list(map(lambda ele: ele.attrib['type'],
             root.findall('THEMROLES/THEMROLE[@type="Agent"]/SELRESTRS/SELRESTR'))
         )

@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict
+from typing import Dict, List
 
 import nltk
 import numpy as np
@@ -12,6 +12,7 @@ from nltk.tokenize import sent_tokenize
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 import web.services.verbnet_service as verbnet_service
+import web.services.wordnet_service as wordnet_service
 
 class Processor:
 
@@ -39,8 +40,10 @@ class Processor:
             map(lambda file_name: f'text/{file_name}', stemmedFileNames)
         )
 
-        cvec = CountVectorizer(stop_words='english', min_df=0.1,
-                               max_df=.2, ngram_range=(1, 2), input='filename')
+        print('Counting terms...')
+
+        cvec = CountVectorizer(stop_words='english', min_df=0.09,
+                               max_df=.25, ngram_range=(1, 2), input='filename')
         cvec.fit(file_locations)
 
         print(f'Total n-grams = {len(cvec.vocabulary_)}')
@@ -166,14 +169,30 @@ class Processor:
             if not verbnet_service.is_physics_verb(lemm):
                 continue
             
-            corpus_data = verbnet_service.get_corpus_ids(lemm)
+            senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
+            hypernym_names = []
+            try:
+                for sense in senses:
+                    hypernym_names += wordnet_service.get_hypernyms(sense)
+            except:
+                print('ERROR: couldn\'t get hypernym names for ', lemm)
+                
             
             new_dict[lemm] = {
                 'score': value,
                 'example': verb_examples[stemmed_verb],
                 'instances': list(stemmed_verb_instances[stemmed_verb]),
-                'database_ids': corpus_data
+                'database_ids': senses,
+                'hypernyms': hypernym_names
             }
+
+        for lemm, entry in new_dict.items():
+            for hyp in entry['hypernyms']:
+                if hyp not in new_dict.keys():
+                    # 
+                    entry['hypernyms'].remove(hyp)
+                else:
+                    print('Hypernym found: ', entry['instances'][0], ' ', hyp)
 
         print('Saving file...')
         with open("web/static/results.json", "w") as tempFile:

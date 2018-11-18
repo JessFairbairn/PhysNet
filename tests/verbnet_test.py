@@ -49,3 +49,8 @@ class WordNetRetrievalTests(unittest.TestCase):
         data = verbnet_service.get_corpus_ids('consent')
 
         self.assertEqual('consent%2:32:00', data.wordnet[0])
+
+    def test_HandlesVerbsWithoutWN(self):
+        data = verbnet_service.get_corpus_ids('activate')
+
+        self.assertEqual(0, len(data.wordnet))

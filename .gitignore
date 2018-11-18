@@ -1,10 +1,10 @@
-dump.xml
+dump*.xml
 
 drafts/*
 verbnet/*
 wordnet/*
 text/*
-
+text_*/*
 #generated files
 web/static/cd-diagrams/*.svg
 web/undefined.svg

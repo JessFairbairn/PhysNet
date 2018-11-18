@@ -16,7 +16,7 @@ sectionsToRemove = ['References', 'Further Reading', 'See also', 'External Links
 
 
 for article in root.findall(f'./{ns}page'):
-    title = article.find(f'{ns}title').text
+    title = article.find(f'{ns}title').text # Type: str
     raw_body = article.find(f'{ns}revision/{ns}text').text
 
     wikicode = mwparserfromhell.parse(raw_body)
@@ -30,6 +30,8 @@ for article in root.findall(f'./{ns}page'):
         except IndexError:
             continue
 
+    # remove slashes from titles
+    title = title.replace('/','_')
 
     stripped = wikicode.strip_code()
     with open(f'text/{title}.txt','w') as myFile:
