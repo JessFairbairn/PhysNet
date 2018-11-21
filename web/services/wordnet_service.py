@@ -1,16 +1,21 @@
 import sys
 
 from nltk.corpus import wordnet as wn
+from nltk.corpus.reader.wordnet import WordNetError
 
-from web.services.verb_definition import VerbData
+from web.services.verb_definition import SenseData
 
-def get_hypernyms(verb:VerbData):
+def get_hypernyms(verb:SenseData):
     if len(verb.wordnet) == 0:
         return []
     elif len(verb.wordnet) > 1:
         print('Multiple wordnet senses for verb: ', verb.wordnet) #TODO: handle this
-        
-    hypernyms = wn.lemma_from_key(verb.wordnet[0] + '::').synset().hypernyms()
+    try:
+        hypernyms = wn.lemma_from_key(verb.wordnet[0] + '::').synset().hypernyms()
+    except WordNetError as e:
+        print("Error getting hypernyms for ", verb.wordnet[0], ': ', e)
+        return []
+
 
     if len(hypernyms) > 1:
         print('Multiple hypernyms for verb! ', hypernyms)

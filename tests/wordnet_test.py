@@ -3,11 +3,11 @@ import unittest
 from nltk.corpus import wordnet as wn
 
 import web.services.wordnet_service as wordnet_service
-from web.services.verb_definition import VerbData
+from web.services.verb_definition import SenseData
 
 class WordNetRetrievalTests(unittest.TestCase):
     def test_dontCrashWhenNoWN(self):
-        data = VerbData()
+        data = SenseData()
         
         wordnet_service.get_hypernyms(data)
 

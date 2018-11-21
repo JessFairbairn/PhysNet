@@ -11,7 +11,9 @@ sys.path.append('/'.join(root[0:index + 1]) + '/ConDep')
 
 import ConDep.condep as condep
 import web.services.directory_service as directory_service
-from web.services.verb_definition import VerbData
+from web.services.verb_definition import SenseData
+
+from web.services import wordnet_service
 
 
 def is_physics_verb(verb:str):
@@ -60,7 +62,7 @@ def get_corpus_ids(verb:str):
         found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
 
         #TODO: check selrests
-        data = VerbData()
+        data = SenseData()
         if found_verb is not None:
             data.verbnet = root.attrib['ID']
             data.propbank = found_verb.attrib['grouping']
@@ -69,6 +71,7 @@ def get_corpus_ids(verb:str):
                 data.wordnet = []
             else:
                 data.wordnet = wordnet_codes.split(' ')
+            data.hypernyms = wordnet_service.get_hypernyms(data)
             senses.append(data)
         else:        
             found_subclass = root.find(f'SUBCLASSES/VNSUBCLASS/MEMBERS/MEMBER[@name="{verb}"]')
@@ -80,6 +83,7 @@ def get_corpus_ids(verb:str):
                     data.wordnet = []
                 else:
                     data.wordnet = wordnet_codes.split(' ')
+                data.hypernyms = wordnet_service.get_hypernyms(data)
                 senses.append(data)
 
     return senses
