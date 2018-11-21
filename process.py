@@ -1,5 +1,6 @@
 import json
 import os
+import pickle
 from typing import Dict, List
 
 import nltk
@@ -21,11 +22,21 @@ class Processor:
         self.spacy = spacy.load('en_core_web_lg')
 
     def run(self):
-        weights_df = self._extract_word_values()
+        print('Begin run')
+
+        try:
+            with open('text/weights.pickle', 'rb') as handle:
+                weights_df = pickle.load(handle)
+        except FileNotFoundError:
+            weights_df = self._extract_word_values()
+            with open('text/weights.pickle', 'wb') as handle:
+                pickle.dump(weights_df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         stemmed_verb_instances, verb_examples = self._extract_verbs_from_documents()
 
         self._save_results(stemmed_verb_instances, verb_examples, weights_df)
+
+
 
     ######### private methods ##########
     def _extract_word_values(self):
@@ -42,8 +53,8 @@ class Processor:
 
         print('Counting terms...')
 
-        cvec = CountVectorizer(stop_words='english', min_df=0.09,
-                               max_df=.25, ngram_range=(1, 2), input='filename')
+        cvec = CountVectorizer(stop_words='english', min_df=0.1,
+                               max_df=.3, ngram_range=(1, 2), input='filename')
         cvec.fit(file_locations)
 
         print(f'Total n-grams = {len(cvec.vocabulary_)}')
@@ -85,7 +96,7 @@ class Processor:
                 print('Extracting verbs from file ', i,
                       ' of ', len(files_in_dir)/2, end='\r')
             filename = os.fsdecode(file)
-            if filename.endswith('-stemmed.txt'):
+            if filename.endswith('-stemmed.txt') or not filename.endswith('.txt'):
                 continue
 
             with open(f'text/{filename}', 'r') as myFile:
@@ -125,11 +136,13 @@ class Processor:
         parsed = self.spacy(sentence)
         pos_tags = list(map(lambda word: (word.text, word.pos_), parsed))
 
-        verb_list = list(
-            map(lambda tuple: tuple[0],
-                filter(lambda tuple: tuple[1] == 'VERB', pos_tags)
+        with open('blacklist.txt', 'r') as blacklist_file:
+            blacklist = blacklist_file.read().strip().split('\n')
+            verb_list = list(
+                map(lambda tup: tup[0],
+                    filter(lambda tup: tup[1] == 'VERB' and tup[0] not in blacklist, pos_tags)
+                )
             )
-        )
 
         return verb_list
 

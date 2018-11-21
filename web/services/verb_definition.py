@@ -11,13 +11,15 @@ class VerbDefinition:
     example = None
     instances = None # Type: List[str]
     condep = None # Type: CDDefinition
-    database_ids = [] # Type: List[VerbData]
+    database_ids = [] # Type: List[SenseData]
     hypernyms = None
 
-class VerbData:
+class SenseData:
     propbank = None
     
     wordnet = []
     'A list of WordNet Sense Keys'
 
     verbnet = None
+
+    hypernyms = []
