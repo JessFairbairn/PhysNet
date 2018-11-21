@@ -90,6 +90,9 @@ def get_corpus_ids(verb:str):
 
 
 def _root_is_physics_sense(root:ET.Element):
+    if root.find('THEMROLES/THEMROLE[@type="Beneficiary"]'):
+        return False
+
     sel_rests = list(map(lambda ele: ele.attrib['type'],
             root.findall('THEMROLES/THEMROLE[@type="Agent"]/SELRESTRS/SELRESTR'))
         )

@@ -54,3 +54,7 @@ class WordNetRetrievalTests(unittest.TestCase):
         data = verbnet_service.get_corpus_ids('activate')
 
         self.assertEqual(0, len(data.wordnet))
+
+class VerbNetPhysicsDetection(unittest.TestCase):
+    def test_FiltersWordsWithBenefitary(self):
+        self.assertFalse(verbnet_service.is_physics_verb('award'))
