@@ -34,7 +34,7 @@ a:hover{
     color:lightseagreen;
 }
 
-*{background-color:#181818}
+html,body{background-color:#181818}
 
 table,td,tr,th{
     border-color: #eee;

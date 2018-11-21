@@ -4,10 +4,14 @@
 
 {% block content %}
 
-<ul>
+<table>
+  <tr><th>Verb</th><th>VerbNet Linked</th></tr>
   {% for verb in verb_list %}
-  <li><a href="/directory/{{verb}}">{{verb}}</a></li>
+  <tr>
+    <td><a href="/directory/{{verb}}">{{verb}}</a></td>
+    <td>{{'Yes' if directory[verb].database_ids else 'No'}}</td>
+  </tr>
   {% endfor %}
-</ul>
+</table>
 
 {% endblock %}

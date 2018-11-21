@@ -34,7 +34,8 @@ def home():
 @app.route('/directory/')
 def directory():
     verb_list = directory_service.get_verb_list()
-    return render_template('directory.html', verb_list=verb_list)
+    verb_directory = directory_service.get_verb_details()
+    return render_template('directory.html', verb_list=verb_list, directory = verb_directory)
 
 @app.route('/directory/<verb>')
 def verb_entry(verb:str):
