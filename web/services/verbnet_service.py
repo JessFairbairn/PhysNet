@@ -26,7 +26,7 @@ def is_physics_verb(verb:str):
         tree = ET.parse('verbnet/' + verb_file)
         root = tree.getroot()
 
-        found_verb = root.find(f'VNCLASS/MEMBERS/MEMBER[@name="{verb}"]')
+        found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
         
 
         if found_verb is None:
@@ -61,7 +61,9 @@ def get_corpus_ids(verb:str):
 
         found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
 
-        #TODO: check selrests
+        if not _root_is_physics_sense(root):
+            continue
+        
         data = SenseData()
         if found_verb is not None:
             data.verbnet = root.attrib['ID']

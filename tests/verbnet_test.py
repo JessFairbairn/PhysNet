@@ -56,5 +56,13 @@ class WordNetRetrievalTests(unittest.TestCase):
         self.assertEqual(0, len(data.wordnet))
 
 class VerbNetPhysicsDetection(unittest.TestCase):
+
+    def test_FiltersWordsWhenAgentIsOrganisation(self):
+        self.assertFalse(verbnet_service.is_physics_verb('extort'))
+
+    def test_FiltersWordsWhenRecipientIsOrganisation(self):
+        self.skipTest('Predict not valid example')
+        self.assertFalse(verbnet_service.is_physics_verb('predict'))
+
     def test_FiltersWordsWithBenefitary(self):
         self.assertFalse(verbnet_service.is_physics_verb('award'))
