@@ -52,12 +52,13 @@ class SVGService:
         arrow_y_pos = SVGService.FONT_SIZE/2 + 2
 
         # Write subject
-        actor_text = svg_document.text("Subject",
+        actor_label = cd.actor_override or "Subject"
+        actor_text = svg_document.text(actor_label,
                                        insert=(0, SVGService.FONT_SIZE))
 
         svg_document.add(actor_text)
 
-        actor_width = SVGService.text_width("Subject", SVGService.FONT_SIZE)
+        actor_width = SVGService.text_width(actor_label, SVGService.FONT_SIZE)
 
         # Add double arrow
         arrow_length = 60
@@ -85,12 +86,13 @@ class SVGService:
         )
 
         # Add Obj Text
-        obj_text = svg_document.text('Object',
+        obj_name = cd.object_override or 'Object'
+        obj_text = svg_document.text(obj_name,
                                      insert=(obj_start_x + 2, SVGService.FONT_SIZE))
 
         svg_document.add(obj_text)
 
-        obj_width = SVGService.text_width('Object', SVGService.FONT_SIZE)
+        obj_width = SVGService.text_width(obj_name, SVGService.FONT_SIZE)
 
         # Set final size of the canvas, then save
         svg_document.attribs['width'] = f'{obj_start_x + obj_width + 3}px'
