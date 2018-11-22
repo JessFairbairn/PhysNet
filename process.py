@@ -53,8 +53,8 @@ class Processor:
 
         print('Counting terms...')
 
-        cvec = CountVectorizer(stop_words='english', min_df=0.1,
-                               max_df=.3, ngram_range=(1, 2), input='filename')
+        cvec = CountVectorizer(stop_words='english', min_df=0.01,
+                               max_df=.5, ngram_range=(1, 2), input='filename')
         cvec.fit(file_locations)
 
         print(f'Total n-grams = {len(cvec.vocabulary_)}')
@@ -180,6 +180,7 @@ class Processor:
 
             
             if not verbnet_service.is_physics_verb(lemm):
+                print('Excluding verb "', lemm, '" as no physics sense found')
                 continue
             
             senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
