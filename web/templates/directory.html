@@ -5,11 +5,24 @@
 {% block content %}
 
 <table>
-  <tr><th>Verb</th><th>VerbNet Linked</th></tr>
+  <tr>
+    <th>Verb</th>
+    <th>VerbNet Linked</th>
+    <th>WordNet Linked</th>
+  </tr>
   {% for verb in verb_list %}
   <tr>
     <td><a href="/directory/{{verb}}">{{verb}}</a></td>
-    <td>{{'Yes' if directory[verb].database_ids else 'No'}}</td>
+    <td>{{'Yes' if (
+                    directory[verb].database_ids and
+                    directory[verb].database_ids[0].verbnet
+                    ) else 'No'}}
+    </td>
+    <td>{{'Yes' if (
+        directory[verb].database_ids and
+        directory[verb].database_ids[0].wordnet
+        ) else 'No'}}
+</td>
   </tr>
   {% endfor %}
 </table>

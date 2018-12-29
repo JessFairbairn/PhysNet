@@ -43,7 +43,8 @@ def get_verb(verb: str):
 def get_verb_details():
     static = _get_static_folder()
     with open(f"{static}/results.json", "r") as tempFile:
-        return json.load(tempFile)
+        directory = json.load(tempFile, object_hook=_decode_complex)
+        return directory
 
 def get_verb_list():
     static = _get_static_folder()
