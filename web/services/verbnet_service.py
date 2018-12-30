@@ -42,8 +42,7 @@ def is_physics_verb(verb:str):
             return True
 
     if not found_in_verbnet:
-        print(f'Verb "{verb}" not in VerbNet')
-        return True
+        raise NotInVerbNetException(f'Verb "{verb}" not in VerbNet')
     else:
         return False
 
@@ -111,3 +110,6 @@ if __name__ == '__main__':
     #         removed_verbs.append(verb)
     # pass
     is_physics_verb('list')
+
+class NotInVerbNetException(Exception):
+    pass

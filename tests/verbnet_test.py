@@ -53,7 +53,7 @@ class WordNetRetrievalTests(unittest.TestCase):
     def test_HandlesVerbsWithoutWN(self):
         data = verbnet_service.get_corpus_ids('activate')
 
-        self.assertEqual(0, len(data.wordnet))
+        self.assertEqual(0, len(data[0].wordnet))
 
 class VerbNetPhysicsDetection(unittest.TestCase):
 
@@ -66,3 +66,10 @@ class VerbNetPhysicsDetection(unittest.TestCase):
 
     def test_FiltersWordsWithBenefitary(self):
         self.assertFalse(verbnet_service.is_physics_verb('award'))
+
+class VerbNeterrorRaising(unittest.TestCase):
+
+    def test_RaisesErrorWhenNotFound(self):
+        with self.assertRaises(verbnet_service.NotInVerbNetException) as context:
+            
+            verbnet_service.is_physics_verb('gjggfdfgdgf')
