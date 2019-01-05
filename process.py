@@ -17,19 +17,29 @@ import web.services.wordnet_service as wordnet_service
 
 class Processor:
 
-    def __init__(self):        
+    def __init__(self):
+
+        #Parameters
+        self.corpus = "astro"
+        self.max_score = 0.9
+        self.min_score = 0.001
+
+
         self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
         self.spacy = spacy.load('en_core_web_lg')
+
+        self.removed_via_blacklist = set()
+        
 
     def run(self):
         print('Begin run')
 
         try:
-            with open('text/weights.pickle', 'rb') as handle:
+            with open(f'text_{self.corpus}/weights.pickle', 'rb') as handle:
                 weights_df = pickle.load(handle)
         except FileNotFoundError:
             weights_df = self._extract_word_values()
-            with open('text/weights.pickle', 'wb') as handle:
+            with open(f'text_{self.corpus}/weights.pickle', 'wb') as handle:
                 pickle.dump(weights_df, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         stemmed_verb_instances, verb_examples = self._extract_verbs_from_documents()
@@ -44,17 +54,17 @@ class Processor:
 
         stemmedFileNames = list(
             filter(lambda fname: fname.endswith(
-                'stemmed.txt'), os.listdir('text'))
+                'stemmed.txt'), os.listdir('text_' + self.corpus))
         )
 
         file_locations = list(
-            map(lambda file_name: f'text/{file_name}', stemmedFileNames)
+            map(lambda file_name: f'text_{self.corpus}/{file_name}', stemmedFileNames)
         )
 
         print('Counting terms...')
 
-        cvec = CountVectorizer(stop_words='english', min_df=0.01,
-                               max_df=.5, ngram_range=(1, 2), input='filename')
+        cvec = CountVectorizer(stop_words='english', min_df=0.001,
+                               max_df=1, ngram_range=(1, 2), input='filename')
         cvec.fit(file_locations)
 
         print(f'Total n-grams = {len(cvec.vocabulary_)}')
@@ -87,7 +97,7 @@ class Processor:
         stemmed_verb_instances = dict()  # Type:dict[string, set]
 
         i = 0
-        files_in_dir = os.listdir('text')
+        files_in_dir = os.listdir('text_' + self.corpus)
         print('Extracting verbs from file ', i,
               ' of ', len(files_in_dir), end='\r')
 
@@ -99,7 +109,7 @@ class Processor:
             if filename.endswith('-stemmed.txt') or not filename.endswith('.txt'):
                 continue
 
-            with open(f'text/{filename}', 'r') as myFile:
+            with open(f'text_{self.corpus}/{filename}', 'r') as myFile:
                 sentences = sent_tokenize(myFile.read())
 
                 clean_sentences = []
@@ -140,9 +150,13 @@ class Processor:
             blacklist = blacklist_file.read().strip().split('\n')
             verb_list = list(
                 map(lambda tup: tup[0],
-                    filter(lambda tup: tup[1] == 'VERB' and tup[0] not in blacklist, pos_tags)
+                    filter(lambda tup: tup[1] == 'VERB', pos_tags)
                 )
             )
+            for verb in verb_list:
+                if verb in blacklist:
+                    self.removed_via_blacklist.add(verb)
+                    verb_list.remove(verb)
 
         return verb_list
 
@@ -156,17 +170,20 @@ class Processor:
         lemmatizer = WordNetLemmatizer()
 
         new_dict = {}
+        
+        verbs_not_found = []
+        wordnet_only = []
+
         for verb in verb_examples:
             stemmed_verb = self.stemmer.stem(verb)
             try:
-                value = weights_df[weights_df.term ==
-                                   stemmed_verb].weight.values[0]
+                value = weights_df[weights_df.term == stemmed_verb].weight.values[0]
 
             except IndexError:
                 # print('Not indexed: ', stemmed_verb)
                 continue
 
-            if value < 0.01:  # tf-idf limit
+            if value < self.min_score:  # tf-idf limit
                 continue
 
             try:
@@ -178,32 +195,48 @@ class Processor:
                 print('Missing: ', stemmed_verb)
                 continue
 
-            
-            if not verbnet_service.is_physics_verb(lemm):
-                print('Excluding verb "', lemm, '" as no physics sense found')
-                continue
-            
-            senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
-            hypernym_names = []
             try:
-                for sense in senses:
-                    hypernym_names += wordnet_service.get_hypernyms(sense)
-            except:
-                print('ERROR: couldn\'t get hypernym names for ', lemm)
+                if verbnet_service.is_physics_verb(lemm):
                 
+                    senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
+                    hypernym_names = []
+                    try:
+                        for sense in senses:
+                            hypernym_names += wordnet_service.get_hypernyms(sense)
+                    except:
+                        print('ERROR: couldn\'t get hypernym names for ', lemm)
+                else:
+                    continue
+            except verbnet_service.NotInVerbNetException:
+                
+                if wordnet_service.is_verb(lemm):
+                    senses = wordnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
+                    
+
+                    hypernym_names = []
+                    for sense in senses:
+                        hypernym_names += wordnet_service.get_hypernyms(sense)
+                    
+                    wordnet_only.append(lemm)
+                else:
+                    verbs_not_found.append(lemm)
+                    continue
+
+            lemm_info = {
+                    'score': value,
+                    'example': verb_examples[stemmed_verb],
+                    'instances': list(stemmed_verb_instances[stemmed_verb]),
+                    'database_ids': senses,
+                    'hypernyms': hypernym_names
+                }
+                
+            new_dict[lemm] = lemm_info
+
             
-            new_dict[lemm] = {
-                'score': value,
-                'example': verb_examples[stemmed_verb],
-                'instances': list(stemmed_verb_instances[stemmed_verb]),
-                'database_ids': senses,
-                'hypernyms': hypernym_names
-            }
 
         for lemm, entry in new_dict.items():
             for hyp in entry['hypernyms']:
                 if hyp not in new_dict.keys():
-                    # 
                     entry['hypernyms'].remove(hyp)
                 else:
                     print('Hypernym found: ', entry['instances'][0], ' ', hyp)
@@ -211,6 +244,22 @@ class Processor:
         print('Saving file...')
         with open("web/static/results.json", "w") as tempFile:
             json.dump(new_dict, tempFile, default=lambda o: o.__dict__)
+        
+        with open(f"web/static/results-{self.corpus}.json", "w") as tempFile:
+            json.dump(new_dict, tempFile, default=lambda o: o.__dict__)
+
+        log_data = {
+            "verbs_not_found": verbs_not_found,
+            "wordnet_only": wordnet_only,
+            "removed_via_blacklist": list(self.removed_via_blacklist)
+        }
+
+        with open("process_log.json", "w") as tempFile:
+            json.dump(log_data, tempFile, default=lambda o: o.__dict__)
+
+        error_num = len(verbs_not_found) + len(wordnet_only) + len(self.removed_via_blacklist)
+        full_num = len(new_dict) + error_num
+        print(f'{(error_num/full_num)*100}% error rate in POS')
 
 
 if __name__ == "__main__":
