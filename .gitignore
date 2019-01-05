@@ -7,9 +7,14 @@ verbnet/*
 wordnet/*
 text/*
 text_*/*
+
 #generated files
 web/static/cd-diagrams/*.svg
 web/undefined.svg
+
+##corpus specific results- not sure what to do with these yet
+web/static/results-*.json
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
