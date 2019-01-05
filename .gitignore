@@ -1,4 +1,6 @@
 dump*.xml
+process_log.json
+physics_articles.txt
 
 drafts/*
 verbnet/*
