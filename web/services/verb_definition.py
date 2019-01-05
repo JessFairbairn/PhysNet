@@ -4,13 +4,13 @@ import typing
 
 # from ConDep import condep.parsing.cd_definitions.CDDefinition
 
-from condep.parsing.cd_definitions import CDDefinition
+# from condep.parsing.cd_definitions import CDDefinition
 
 class VerbDefinition:
     score = None
     example = None
     instances = None # Type: List[str]
-    condep = None # Type: CDDefinition
+    condep = None ## Type: CDDefinition
     database_ids = [] # Type: List[SenseData]
     hypernyms = None
 
