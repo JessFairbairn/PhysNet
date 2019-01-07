@@ -6,6 +6,8 @@ from process import Processor
 
 class TagWordsWithPOS(unittest.TestCase):
     def test_tagsCorrectly(self):
+        self.skipTest('slow- integration test')
+        
         blah = Processor()
         sentence = "Because such compact stars have high gravitational fields, the material falls with a high velocity towards the compact star, usually colliding with other accreted material en route, forming an accretion disk."
 
