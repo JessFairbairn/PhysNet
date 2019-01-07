@@ -57,23 +57,17 @@ Forms found:
         </dd>
         {%endif%}
     </dl>
-    <h3>Hypernyms</h3>
+    {% if sense.hypernyms %}
+    <h4>Hypernyms</h4>
     <ul>
         {% for form in sense.hypernyms %}
         <li><a href="{{form}}">{{form}}</a></li>
         {% endfor %}
     </ul>
     {%endif%}
+    {%endif%}
 
 {% endfor %}
 
-{% if data.hypernyms %}
-    <h2>Hypernyms</h2>
-    <ul>
-        {% for form in data.hypernyms %}
-        <li><a href="{{form}}">{{form}}</a></li>
-        {% endfor %}
-    </ul>
-{%endif%}
 
 {% endblock %}

@@ -12,7 +12,6 @@ class VerbDefinition:
     instances = None # Type: List[str]
     condep = None ## Type: CDDefinition
     database_ids = [] # Type: List[SenseData]
-    hypernyms = None
 
 class SenseData:
     propbank = None
