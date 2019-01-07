@@ -173,6 +173,7 @@ class Processor:
         
         verbs_not_found = []
         wordnet_only = []
+        vb_themrole_value_error = []
 
         for verb in verb_examples:
             stemmed_verb = self.stemmer.stem(verb)
@@ -199,23 +200,14 @@ class Processor:
                 if verbnet_service.is_physics_verb(lemm):
                 
                     senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
-                    hypernym_names = []
-                    try:
-                        for sense in senses:
-                            hypernym_names += wordnet_service.get_hypernyms(sense)
-                    except:
-                        print('ERROR: couldn\'t get hypernym names for ', lemm)
                 else:
                     continue
-            except verbnet_service.NotInVerbNetException:
+            except (verbnet_service.NotInVerbNetException, ValueError) as e:
+                if type(e) == ValueError:
+                    vb_themrole_value_error.append(verb)
                 
                 if wordnet_service.is_verb(lemm):
                     senses = wordnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
-                    
-
-                    hypernym_names = []
-                    for sense in senses:
-                        hypernym_names += wordnet_service.get_hypernyms(sense)
                     
                     wordnet_only.append(lemm)
                 else:
@@ -226,20 +218,19 @@ class Processor:
                     'score': value,
                     'example': verb_examples[stemmed_verb],
                     'instances': list(stemmed_verb_instances[stemmed_verb]),
-                    'database_ids': senses,
-                    'hypernyms': hypernym_names
+                    'database_ids': senses
                 }
                 
             new_dict[lemm] = lemm_info
 
             
 
-        for lemm, entry in new_dict.items():
-            for hyp in entry['hypernyms']:
-                if hyp not in new_dict.keys():
-                    entry['hypernyms'].remove(hyp)
-                else:
-                    print('Hypernym found: ', entry['instances'][0], ' ', hyp)
+        # for lemm, entry in new_dict.items():
+        #     for hyp in entry['hypernyms']:
+        #         if hyp not in new_dict.keys():
+        #             entry['hypernyms'].remove(hyp)
+        #         else:
+        #             print('Hypernym found: ', entry['instances'][0], ' ', hyp)
 
         print('Saving file...')
         with open("web/static/results.json", "w") as tempFile:
