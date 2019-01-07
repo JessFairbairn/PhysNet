@@ -47,7 +47,7 @@ def get_verb(verb: str):
             condep = condep_verbs.dictionary[verb]
             verb_def.condep = condep
 
-        except KeyError:
+        except (KeyError, AttributeError):
             pass
 
         return verb_def
