@@ -4,24 +4,36 @@ import os
 import typing
 
 # from classes.verb_definition import VerbDefinition
-from .verb_definition import VerbDefinition
+from .verb_definition import VerbDefinition, SenseData
 
 import condep.definitions.verbs as condep_verbs
 
 
 def _decode_complex(dct: dict):
 
+    possible_classes = [SenseData, VerbDefinition]
+
+    for possible_class in possible_classes:
+
+        is_member = _is_instance_of_class(dct, possible_class)
+        if not is_member:
+            continue
+
+        obj = possible_class() # Assumes a constructor without arguments!
+        for key, value in dct.items():
+            setattr(obj, key, value)
+        return obj
+    
+    # if it couldn't be decoded into one of those, just return the input dict
+    return dct
+
+def _is_instance_of_class(dct:dict, class_to_check:type):
     members = inspect.getmembers(
-        VerbDefinition, lambda a: not(inspect.isroutine(a)))
+        class_to_check, lambda a: not(inspect.isroutine(a)))
     members = list(filter(lambda tup: not tup[0].startswith('_'), members))
     members = list(map(lambda tup: tup[0], members))
-    if not set(dct.keys()).issubset(members):
-        return dct
-
-    obj = VerbDefinition()
-    for key, value in dct.items():
-        setattr(obj, key, value)
-    return obj
+    is_member = set(dct.keys()).issubset(members)
+    return is_member
 
 
 def get_verb(verb: str):
