@@ -11,6 +11,7 @@ text_*/*
 #generated files
 web/static/cd-diagrams/*.svg
 web/undefined.svg
+undefined.svg
 
 ##corpus specific results- not sure what to do with these yet
 web/static/results-*.json
