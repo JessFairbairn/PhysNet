@@ -1,8 +1,7 @@
 import os
 import sys
 
-import xml.etree.ElementTree as ET
-
+import nltk
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 root = dir_path.split('/')
@@ -15,100 +14,94 @@ from web.services.verb_definition import SenseData
 
 from web.services import wordnet_service
 
+vb = nltk.corpus.util.LazyCorpusLoader('verbnet3', nltk.corpus.reader.verbnet.VerbnetCorpusReader,r'(?!\.).*\.xml')
+
+
 
 def is_physics_verb(verb:str):
-    files_in_dir = os.listdir('verbnet')
-    found_in_verbnet = False
 
-    for verb_file in files_in_dir:
-        if not verb_file.endswith('.xml'):
-            continue
-        tree = ET.parse('verbnet/' + verb_file)
-        root = tree.getroot()
+    classids = vb.classids(lemma=verb)
+    if not classids:
+        raise NotInVerbNetException(f'Verb "{verb}" not in VerbNet')
 
-        found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
-        
+    for classid in classids:
+        themroles = _get_themroles_for_class_id(classid)
 
-        if found_verb is None:
-            found_subclass = root.find(f'SUBCLASSES/VNSUBCLASS/MEMBERS/MEMBER[@name="{verb}"]')
-            if found_subclass is None:
-                continue
-            else:
-                found_in_verbnet = True
-        else:
-            found_in_verbnet = True
-
-        if _root_is_physics_sense(root):
+        if _is_physics_class(themroles):
             return True
 
-    if not found_in_verbnet:
-        raise NotInVerbNetException(f'Verb "{verb}" not in VerbNet')
-    else:
-        return False
+    return False
 
 
 def get_corpus_ids(verb:str):
     senses = []
 
-    files_in_dir = os.listdir('verbnet')
+    classids = vb.classids(lemma=verb)
+    if not classids:
+        raise NotInVerbNetException(f'Verb "{verb}" not in VerbNet')
 
-    for verb_file in files_in_dir:
-        if not verb_file.endswith('.xml'):
+    for class_id in classids:
+        themroles = _get_themroles_for_class_id(class_id)
+
+        if not _is_physics_class(themroles): # is this right?
             continue
-        tree = ET.parse('verbnet/' + verb_file)
-        root = tree.getroot()
 
-        found_verb = root.find(f'MEMBERS/MEMBER[@name="{verb}"]')
-
-        if not _root_is_physics_sense(root):
-            continue
         
         data = SenseData()
-        if found_verb is not None:
-            data.verbnet = root.attrib['ID']
-            data.propbank = found_verb.attrib['grouping']
-            wordnet_codes = found_verb.attrib['wn']
-            if wordnet_codes == '':
-                data.wordnet = []
-            else:
-                data.wordnet = wordnet_codes.split(' ')
-            data.hypernyms = wordnet_service.get_hypernyms(data)
-            senses.append(data)
-        else:        
-            found_subclass = root.find(f'SUBCLASSES/VNSUBCLASS/MEMBERS/MEMBER[@name="{verb}"]')
-            if found_subclass is not None:
-                data.verbnet = root.attrib['ID']
-                data.propbank =  found_subclass.attrib['grouping']
-                wordnet_codes = found_subclass.attrib['wn']
-                if wordnet_codes == '':
-                    data.wordnet = []
-                else:
-                    data.wordnet = wordnet_codes.split(' ')
-                data.hypernyms = wordnet_service.get_hypernyms(data)
-                senses.append(data)
+        
+        data.verbnet = class_id
+        # data.propbank = found_verb.attrib['grouping']
+
+        # Get wordnet codes
+        xml = vb.vnclass(class_id)
+        member_node = xml.find(f'*/MEMBER[@name="{verb}"]') # TODO: Assuming only one node- check?
+        wordnet_codes = member_node.attrib['wn']
+
+        if wordnet_codes == '':
+            data.wordnet = []
+        else:
+            data.wordnet = wordnet_codes.split(' ')
+
+        # Get Hypernyms
+        data.hypernyms = wordnet_service.get_hypernyms(data)
+        senses.append(data)
+        
 
     return senses
 
 
-def _root_is_physics_sense(root:ET.Element):
-    if root.find('THEMROLES/THEMROLE[@type="Beneficiary"]'):
-        return False
+def _is_physics_class(themroles:list):
+    if not themroles:
+        raise ValueError('themroles list empty')
 
-    sel_rests = list(map(lambda ele: ele.attrib['type'],
-            root.findall('THEMROLES/THEMROLE[@type="Agent"]/SELRESTRS/SELRESTR'))
-        )
-    if 'organization' in sel_rests:
-        return False
-    else:
-        return True
+    banned_roles = ['Beneficiary', 'Experiencer', 'Predicate']
+    banned_selrests = ['organization', 'currency']
+    
+    for role in themroles:
+        if role['type'] in banned_roles:
+            return False
+
+        if role['modifiers']:
+            for modifier in role['modifiers']:
+                if modifier['type'] in banned_selrests:
+                    return False
+    return True
+
+def _get_themroles_for_class_id(class_id:str, fuse = 0):
+    assert fuse < 100
+
+    themroles = vb.themroles(class_id)
+
+    if not themroles:
+        id_components = vb.shortid(class_id).split('-')
+        assert len(id_components) > 1
+        parent_id = '-'.join(id_components[0:-1])
+        themroles = _get_themroles_for_class_id(parent_id, fuse + 1)
+        
+    return themroles
+
 
 if __name__ == '__main__':
-    # verb_list = directory_service.get_verb_list()
-    # removed_verbs = []
-    # for verb in verb_list:
-    #     if not is_physics_verb(verb):
-    #         removed_verbs.append(verb)
-    # pass
     is_physics_verb('list')
 
 class NotInVerbNetException(Exception):
