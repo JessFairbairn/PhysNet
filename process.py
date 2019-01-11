@@ -175,6 +175,8 @@ class Processor:
         wordnet_only = []
         vb_themrole_value_error = []
 
+        not_physics_verb = []
+
         for verb in verb_examples:
             stemmed_verb = self.stemmer.stem(verb)
             try:
@@ -201,6 +203,7 @@ class Processor:
                 
                     senses = verbnet_service.get_corpus_ids(lemm) # Type: List[VerbData]
                 else:
+                    not_physics_verb.append(lemm)
                     continue
             except (verbnet_service.NotInVerbNetException, ValueError) as e:
                 if type(e) == ValueError:
@@ -242,7 +245,9 @@ class Processor:
         log_data = {
             "verbs_not_found": verbs_not_found,
             "wordnet_only": wordnet_only,
-            "removed_via_blacklist": list(self.removed_via_blacklist)
+            "removed_via_blacklist": list(self.removed_via_blacklist),
+            "vb_themrole_value_error":vb_themrole_value_error,
+            "not_physics_verb": not_physics_verb
         }
 
         with open("process_log.json", "w") as tempFile:
