@@ -3,10 +3,13 @@ import json
 import os
 import typing
 
-# from classes.verb_definition import VerbDefinition
-from .verb_definition import VerbDefinition, SenseData
+try:
+    # from classes.verb_definition import VerbDefinition
+    from .verb_definition import VerbDefinition, SenseData
 
-import condep.definitions.verbs as condep_verbs
+    import condep.definitions.verbs as condep_verbs
+except ImportError:
+    raise
 
 
 def _decode_complex(dct: dict):
@@ -73,6 +76,16 @@ def get_verb_list():
 
         return verb_list
 
+def get_verbs_in_synset(synset:str):
+    directory = get_verb_details() # type: List[VerbDefinition]
+
+    verbs_in_synset = []
+    for k, verb_data in directory.items():
+        if list(filter(lambda sense: sense.synset == synset, verb_data.database_ids)):
+            verbs_in_synset.append(k)
+    return verbs_in_synset
+
+# PRIVATE #
 
 def _get_static_folder():
     #     return os.environ.get('STATIC_DIR', 'static')
@@ -91,3 +104,4 @@ def _get_static_folder():
             return 'static'
         else:
             return 'web/static'
+

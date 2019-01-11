@@ -45,6 +45,11 @@ def verb_entry(verb:str):
         return abort(404)
     return render_template('entry.html', verb=verb, data=verb_info)
 
+@app.route('/synsets/<set_name>')
+def synset(set_name:str):
+    verbs_in_set = directory_service.get_verbs_in_synset(set_name)
+    return render_template('synset.html', set_name=set_name, verbs_in_set=verbs_in_set)
+
 @app.route('/svg/<verb>')
 def get_condep_diagram(verb:str):
     if not svg_service.SVGService.diagram_exists(verb):

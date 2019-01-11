@@ -27,6 +27,15 @@ Forms found:
     {% if sense.verbnet or sense.propbank or sense.wordnet %}
     <h3>Sense</h3>
     <dl>
+        {% if sense.synset %} 
+        <dt>Synset</dt>
+        <dd>
+          <a href="/synsets/{{sense.synset }}">
+            {{sense.synset }}
+          </a>
+        </dd>
+        {%endif%}
+
         {% if sense.verbnet %} 
         {% set url = '-'.join(sense.verbnet.split('-')[0:2]) %}
         <dt>VerbNet ID</dt>
@@ -57,11 +66,12 @@ Forms found:
         </dd>
         {%endif%}
     </dl>
+
     {% if sense.hypernyms %}
     <h4>Hypernyms</h4>
     <ul>
         {% for form in sense.hypernyms %}
-        <li><a href="{{form}}">{{form}}</a></li>
+        <li><a href="/synsets/{{form}}">{{form}}</a></li>
         {% endfor %}
     </ul>
     {%endif%}

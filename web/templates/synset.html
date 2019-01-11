@@ -1,0 +1,19 @@
+{% extends "_base.html" %}
+{% block title %}{{set_name}}{% endblock %}
+
+
+{% block content %}
+
+{% if verbs_in_set %}
+Verbs in synset:
+<ul>
+  {% for verb in verbs_in_set %}
+  <li><a href="/directory/{{verb}}">{{verb}}</a></li>
+  {%endfor%}
+</ul>
+{% else %}
+No verbs in PhysNet for {{set_name}}
+{%endif%}
+
+
+{% endblock %}
