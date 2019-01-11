@@ -19,6 +19,9 @@ class SenseData:
     wordnet = []
     'A list of WordNet Sense Keys'
 
+    synset = None
+    'Wordnet synset name'
+
     verbnet = None
 
     hypernyms = []

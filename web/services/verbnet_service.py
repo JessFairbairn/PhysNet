@@ -61,6 +61,7 @@ def get_corpus_ids(verb:str):
             data.wordnet = []
         else:
             data.wordnet = wordnet_codes.split(' ')
+            data.synset = wordnet_service.get_synset_from_key(data.wordnet[0])
 
         # Get Hypernyms
         data.hypernyms = wordnet_service.get_hypernyms(data)
@@ -75,7 +76,7 @@ def _is_physics_class(themroles:list):
         raise ValueError('themroles list empty')
 
     banned_roles = ['Beneficiary', 'Experiencer', 'Predicate']
-    banned_selrests = ['organization', 'currency']
+    banned_selrests = ['organization', 'currency', 'animate']
     
     for role in themroles:
         if role['type'] in banned_roles:

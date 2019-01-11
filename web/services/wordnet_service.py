@@ -1,7 +1,7 @@
 import sys
 
 from nltk.corpus import wordnet as wn
-# from nltk.corpus.reader.wordnet import WordNetError
+from nltk.corpus.reader.wordnet import WordNetError
 
 from web.services.verb_definition import SenseData
 
@@ -23,6 +23,12 @@ def get_corpus_ids(lemm:str):
 
     return senses
     
+def get_synset_from_key(key:str):
+    try:
+        return wn.lemma_from_key(key + '::').synset().name()
+    except WordNetError as e:
+        print('Wordnet Error getting synset from key: ', e.args)
+        return None
 
 
 def get_hypernyms(verb:SenseData):
@@ -38,10 +44,10 @@ def get_hypernyms(verb:SenseData):
         return []
 
     if len(hypernyms) > 1:
-        print('Multiple hypernyms for verb! ', hypernyms)
+        print('Multiple hypernym synsets for verb: ', hypernyms)
     
     try:
-        return hypernyms[0].lemma_names()
+        return [hypernyms[0].name()]
     except IndexError:
         return []
 
