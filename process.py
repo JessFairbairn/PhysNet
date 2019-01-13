@@ -14,6 +14,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 
 import web.services.verbnet_service as verbnet_service
 import web.services.wordnet_service as wordnet_service
+from web.services.verb_definition import SenseData
 
 class Processor:
 
@@ -217,30 +218,38 @@ class Processor:
                     verbs_not_found.append(lemm)
                     continue
 
-            lemm_info = {
-                    'score': value,
-                    'example': verb_examples[stemmed_verb],
-                    'instances': list(stemmed_verb_instances[stemmed_verb]),
-                    'database_ids': senses
-                }
+            lemm_info = SenseData()            
+            lemm_info.score = value,
+            lemm_info.example = verb_examples[stemmed_verb],
+            lemm_info.instances = list(stemmed_verb_instances[stemmed_verb]),
+            lemm_info.database_ids = senses                
                 
             new_dict[lemm] = lemm_info
 
-            
+        verbs_in_synsets = dict()
 
-        # for lemm, entry in new_dict.items():
-        #     for hyp in entry['hypernyms']:
-        #         if hyp not in new_dict.keys():
-        #             entry['hypernyms'].remove(hyp)
-        #         else:
-        #             print('Hypernym found: ', entry['instances'][0], ' ', hyp)
+        for lemma, verb_data in new_dict.items():
+            for sense in verb_data.database_ids:
+
+                if not sense.synset:
+                    continue
+
+                if sense.synset in verbs_in_synsets.keys():
+                    verbs_in_synsets[sense.synset].add(lemma)
+                else:
+                    verbs_in_synsets[sense.synset] = set([lemma])
+
+        file_data = {
+            'directory': new_dict,
+            'synsets': verbs_in_synsets
+        }
 
         print('Saving file...')
         with open("web/static/results.json", "w") as tempFile:
-            json.dump(new_dict, tempFile, default=lambda o: o.__dict__)
+            json.dump(file_data, tempFile, default=encode_for_json)
         
         with open(f"web/static/results-{self.corpus}.json", "w") as tempFile:
-            json.dump(new_dict, tempFile, default=lambda o: o.__dict__)
+            json.dump(file_data, tempFile, default=encode_for_json)
 
         log_data = {
             "verbs_not_found": verbs_not_found,
@@ -251,12 +260,17 @@ class Processor:
         }
 
         with open("process_log.json", "w") as tempFile:
-            json.dump(log_data, tempFile, default=lambda o: o.__dict__)
+            json.dump(log_data, tempFile, default=encode_for_json)
 
         error_num = len(verbs_not_found) + len(wordnet_only) + len(self.removed_via_blacklist)
         full_num = len(new_dict) + error_num
         print(f'{(error_num/full_num)*100}% error rate in POS')
 
+def encode_for_json(obj):
+    if type(obj) == set:
+        return list(obj)
+    else:
+        return obj.__dict__
 
 if __name__ == "__main__":
     processor = Processor()

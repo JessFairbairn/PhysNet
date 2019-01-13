@@ -12,37 +12,8 @@ except ImportError:
     raise
 
 
-def _decode_complex(dct: dict):
-
-    possible_classes = [SenseData, VerbDefinition]
-
-    for possible_class in possible_classes:
-
-        is_member = _is_instance_of_class(dct, possible_class)
-        if not is_member:
-            continue
-
-        obj = possible_class() # Assumes a constructor without arguments!
-        for key, value in dct.items():
-            setattr(obj, key, value)
-        return obj
-    
-    # if it couldn't be decoded into one of those, just return the input dict
-    return dct
-
-def _is_instance_of_class(dct:dict, class_to_check:type):
-    members = inspect.getmembers(
-        class_to_check, lambda a: not(inspect.isroutine(a)))
-    members = list(filter(lambda tup: not tup[0].startswith('_'), members))
-    members = list(map(lambda tup: tup[0], members))
-    is_member = set(dct.keys()).issubset(members)
-    return is_member
-
-
 def get_verb(verb: str):
-    static = _get_static_folder()
-    with open(f"{static}/results.json", "r") as tempFile:
-        directory = json.load(tempFile, object_hook=_decode_complex)
+        directory = _get_file_data()['directory']
 
         verb_def = directory.get(verb)
 
@@ -56,25 +27,21 @@ def get_verb(verb: str):
         return verb_def
 
 def get_verb_details():
-    static = _get_static_folder()
-    with open(f"{static}/results.json", "r") as tempFile:
-        directory = json.load(tempFile, object_hook=_decode_complex)
-        return directory
+    return _get_file_data()['directory']
 
 def get_verb_list():
-    static = _get_static_folder()
-    with open(f"{static}/results.json", "r") as tempFile:
-        directory = json.load(tempFile)  # Type: dict[str]
+    
+    directory = _get_file_data()['directory']  # Type: dict[str]
 
-        # turn into list of tuples
-        tuples = directory.items()
+    # turn into list of tuples
+    tuples = directory.items()
 
-        tuples = sorted(
-            list(tuples), key=lambda verb: verb[1]['score'], reverse=True)
+    tuples = sorted(
+        list(tuples), key=lambda verb: verb[1].score, reverse=True)
 
-        verb_list = [verb[0] for verb in tuples]
+    verb_list = [verb[0] for verb in tuples]
 
-        return verb_list
+    return verb_list
 
 def get_verbs_in_synset(synset:str):
     directory = get_verb_details() # type: List[VerbDefinition]
@@ -105,3 +72,34 @@ def _get_static_folder():
         else:
             return 'web/static'
 
+def _decode_complex(dct: dict):
+
+    possible_classes = [SenseData, VerbDefinition]
+
+    for possible_class in possible_classes:
+
+        is_member = _is_instance_of_class(dct, possible_class)
+        if not is_member:
+            continue
+
+        obj = possible_class() # Assumes a constructor without arguments!
+        for key, value in dct.items():
+            setattr(obj, key, value)
+        return obj
+    
+    # if it couldn't be decoded into one of those, just return the input dict
+    return dct
+
+def _is_instance_of_class(dct:dict, class_to_check:type):
+    members = inspect.getmembers(
+        class_to_check, lambda a: not(inspect.isroutine(a)))
+    members = list(filter(lambda tup: not tup[0].startswith('_'), members))
+    members = list(map(lambda tup: tup[0], members))
+    is_member = set(dct.keys()).issubset(members)
+    return is_member
+
+def _get_file_data():
+    static = _get_static_folder()
+    with open(f"{static}/results.json", "r") as tempFile:
+        file_data = json.load(tempFile, object_hook=_decode_complex)
+        return file_data
