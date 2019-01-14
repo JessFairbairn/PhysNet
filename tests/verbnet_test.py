@@ -1,5 +1,3 @@
-from unittest import mock
-from unittest.mock import patch
 import unittest
 
 from web.services import verbnet_service
