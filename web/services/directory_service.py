@@ -15,14 +15,14 @@ except ImportError:
 def get_verb(verb: str):
         directory = _get_file_data()['directory']
 
-        verb_def = directory.get(verb)
+        verb_def = directory.get(verb) # type: VerbDefinition
 
-        try:
-            condep = condep_verbs.dictionary[verb]
-            verb_def.condep = condep
+        # try:
+        #     condep = condep_verbs.dictionary[verb]
+        #     verb_def.condep = condep
 
-        except (KeyError, AttributeError):
-            pass
+        # except (KeyError, AttributeError):
+        #     pass
 
         return verb_def
 
@@ -43,7 +43,7 @@ def get_verb_list():
 
     return verb_list
 
-def get_verbs_in_synset(synset:str):
+def calculate_verbs_in_synsets(synset:str):
     directory = get_verb_details() # type: List[VerbDefinition]
 
     verbs_in_synset = []
@@ -51,6 +51,12 @@ def get_verbs_in_synset(synset:str):
         if list(filter(lambda sense: sense.synset == synset, verb_data.database_ids)):
             verbs_in_synset.append(k)
     return verbs_in_synset
+
+def get_verbs_in_synset(synset:str):
+    try:
+        return _get_file_data()['synsets'][synset]
+    except KeyError:
+        return []
 
 # PRIVATE #
 

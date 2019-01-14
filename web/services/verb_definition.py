@@ -24,4 +24,4 @@ class SenseData:
 
     verbnet = None
 
-    hypernyms = []
+    hypernyms = [] # type: List[str]
