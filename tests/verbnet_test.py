@@ -1,6 +1,8 @@
+import typing
 import unittest
 
 from web.services import verbnet_service
+from web.services.verb_definition import SenseData
 
 class VerbNetIdRetrievalTests(unittest.TestCase):
     def test_GetsIdCorrectly_WhenMultipleInstances(self):
@@ -95,6 +97,23 @@ class VerbNetPhysicsClassDetection(unittest.TestCase):
         self.assertFalse(
             verbnet_service._is_physics_class(themroles)
         )
+
+    def test_organisationSensesArentIncluded(self):
+        senses = verbnet_service.get_corpus_ids('open') # Type: List[SenseData]
+        for sense in senses:
+            self.assertFalse(sense.verbnet == 'establish-55.5-1')
+
+class RecursiveThemroleRetrivalTests(unittest.TestCase):
+    def test_AddsThemrolesFromParentClassesToSubclass(self):
+        themroles_retrieved = verbnet_service._get_themroles_for_class_id('establish-55.5-1')
+        self.assertEqual(len(themroles_retrieved), 3, 'should combine the themroles from the parent class')
+
+        themrole_types = list(map(lambda role: role['type'], themroles_retrieved))
+
+        expected_roles = ['Agent', 'Theme', 'Instrument']
+        for role in expected_roles:
+            self.assertIn(role, themrole_types)
+
 
 #exmaple themroles:
 # [{'type': 'Agent', 'modifiers': [{'value': '+', 'type': 'animate'}, {'value': '+', 'type': 'organization'}]}, {'type': 'Theme', 'modifiers': []}, {'type': 'Source', 'modifiers': []}, {'type': 'Beneficiary', 'modifiers': [{'value': '+', 'type': 'animate'}]}]

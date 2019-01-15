@@ -8,7 +8,7 @@ root = dir_path.split('/')
 index = root.index('PhysNet')
 sys.path.append('/'.join(root[0:index + 1]) + '/ConDep')
 
-import ConDep.condep as condep
+import condep as condep
 import web.services.directory_service as directory_service
 from web.services.verb_definition import SenseData
 
@@ -89,15 +89,21 @@ def _is_physics_class(themroles:list):
     return True
 
 def _get_themroles_for_class_id(class_id:str, fuse = 0):
-    assert fuse < 100
+    assert fuse < 50
 
     themroles = vb.themroles(class_id)
+    assert type(themroles) == list
+    
+    id_components = vb.shortid(class_id).split('-')
+    if len(id_components) == 1:
+        return themroles
+    parent_id = '-'.join(id_components[0:-1])
 
-    if not themroles:
-        id_components = vb.shortid(class_id).split('-')
-        assert len(id_components) > 1
-        parent_id = '-'.join(id_components[0:-1])
-        themroles = _get_themroles_for_class_id(parent_id, fuse + 1)
+    themroles = themroles + _get_themroles_for_class_id(parent_id, fuse + 1)
+
+    #TODO: need to actually override themroles from superclasses if there's a clash
+    themrole_types = list(map(lambda role: role['type'], themroles))
+    assert len(themrole_types) == len(set(themrole_types))
         
     return themroles
 
