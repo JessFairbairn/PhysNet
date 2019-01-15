@@ -1,6 +1,7 @@
 import typing
 
 from web.services import directory_service
+from web.services import condep_service
 
 directory = directory_service.get_verb_details() # Type: Dict
 
@@ -40,6 +41,18 @@ for lemma, verb_data in directory.items():
 synsets_with_hyponyms = set(children.keys())
 top_level_synsets = list_of_synsets.difference(synsets_with_hypernyms)
 
+synsets_needing_cd = []
+for synset in top_level_synsets:
+    
+    verbs = directory_service.get_verbs_in_synset(synset)
+    for verb in verbs:
+        cd = condep_service.get_condep_for_verb(verb)
+        if cd:
+            break
+    
+    if not cd:
+        synsets_needing_cd.append(synset)
+
 with open('top_level_synsets.txt','w') as syn_file:
     
-    syn_file.write('\n'.join(top_level_synsets))
+    syn_file.write('\n'.join(synsets_needing_cd))
