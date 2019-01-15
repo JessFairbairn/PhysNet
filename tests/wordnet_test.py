@@ -22,7 +22,7 @@ class WordNetVerbTests(unittest.TestCase):
 
 class WordnetSynsetRetrievalTests(unittest.TestCase):
     def test_getsSynsetFromKey(self):
-        result = wordnet_service.get_synset_from_key('choke%2:35:00::')
+        result = wordnet_service.get_synset_from_key('choke%2:35:00')
         
         self.assertEqual(result, 'choke.v.02')
 
