@@ -11,6 +11,7 @@ def is_verb(lemm:str):
     return len(lemmas)
 
 def get_corpus_ids(lemm:str):
+    
     lemmas = wn.lemmas(lemm, pos=wn.VERB)
 
     senses = []
@@ -19,6 +20,9 @@ def get_corpus_ids(lemm:str):
         
         data.wordnet = [lemma.key()[0:-2]]
         data.hypernyms = get_hypernyms(data)
+
+        data.synset = lemma.synset().name()
+        
         senses.append(data)
 
     return senses

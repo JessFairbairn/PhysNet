@@ -18,6 +18,8 @@ class WordNetVerbTests(unittest.TestCase):
             self.assertEqual(len(sense.wordnet), 1)
             self.assertTrue(sense.wordnet[0])
             self.assertTrue(sense.hypernyms)
+            self.assertTrue(sense.synset)
+            self.assertIsInstance(sense.synset, str)
 
 
 class WordnetSynsetRetrievalTests(unittest.TestCase):
