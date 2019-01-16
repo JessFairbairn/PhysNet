@@ -29,6 +29,10 @@ def get_condep_for_verb(verb:str):
 
             verbs_in_synset = directory_service.get_verbs_in_synset(synset) # type: List[str]
             for hyper_verb in verbs_in_synset:
+                if hyper_verb == verb:
+                    print('Recursive error for verb ' + verb)
+                    return None
+                    
                 new_cd = get_condep_for_verb(hyper_verb)
                 if new_cd:
                     return new_cd
