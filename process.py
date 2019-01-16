@@ -65,7 +65,7 @@ class Processor:
         print('Counting terms...')
 
         cvec = CountVectorizer(stop_words='english', min_df=0.001,
-                               max_df=1, ngram_range=(1, 2), input='filename')
+                               max_df=0.9, ngram_range=(1, 2), input='filename')
         cvec.fit(file_locations)
 
         print(f'Total n-grams = {len(cvec.vocabulary_)}')
