@@ -25,3 +25,8 @@ engineer
 current
 constant
 say
+account
+calculate
+study
+look
+confirm
