@@ -22,7 +22,11 @@ try:
 except ImportError:
     from services import svg_service
 
-from services import condep_service
+try:
+    from .services import condep_service
+except ImportError:
+    from services import condep_service
+
 
 
 app = Flask(__name__)
