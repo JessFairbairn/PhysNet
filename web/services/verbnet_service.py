@@ -75,7 +75,7 @@ def _is_physics_class(themroles:list):
     if not themroles:
         raise ValueError('themroles list empty')
 
-    banned_roles = ['Beneficiary', 'Experiencer', 'Predicate']
+    banned_roles = ['Beneficiary', 'Experiencer', 'Predicate', 'Value']
     banned_selrests = ['organization', 'currency', 'animate']
     
     for role in themroles:
@@ -102,8 +102,8 @@ def _get_themroles_for_class_id(class_id:str, fuse = 0):
     themroles = themroles + _get_themroles_for_class_id(parent_id, fuse + 1)
 
     #TODO: need to actually override themroles from superclasses if there's a clash
-    themrole_types = list(map(lambda role: role['type'], themroles))
-    assert len(themrole_types) == len(set(themrole_types))
+    # themrole_types = list(map(lambda role: role['type'], themroles))
+    # assert len(themrole_types) == len(set(themrole_types))
         
     return themroles
 
