@@ -19,7 +19,7 @@ from web.services.verb_definition import SenseData
 class Processor:
 
     def __init__(self):
-
+        print('Initialising...')
         #Parameters
         self.corpus = "astro"
         self.max_score = 0.9
@@ -28,6 +28,13 @@ class Processor:
 
         self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
         self.spacy = spacy.load('en_core_web_lg')
+
+        with open('blacklist.txt', 'r') as blacklist_file:
+            blacklist = blacklist_file.read().strip().split('\n') # type: List[str]
+            blacklist = list(
+                filter(lambda word: word and not word.startswith('#'), blacklist)
+            )
+            self.blacklist = blacklist
 
         self.removed_via_blacklist = set()
         
@@ -128,6 +135,10 @@ class Processor:
                     for verb in list_of_verbs:
 
                         stemmed = self.stemmer.stem(verb).lower()
+                        if stemmed in self.blacklist:
+                            self.removed_via_blacklist.add(stemmed)
+                            continue
+                            
                         try:
                             (stemmed_verb_instances[stemmed]).add(
                                 verb.lower())
@@ -147,17 +158,16 @@ class Processor:
         parsed = self.spacy(sentence)
         pos_tags = list(map(lambda word: (word.text, word.pos_), parsed))
 
-        with open('blacklist.txt', 'r') as blacklist_file:
-            blacklist = blacklist_file.read().strip().split('\n')
-            verb_list = list(
-                map(lambda tup: tup[0],
-                    filter(lambda tup: tup[1] == 'VERB', pos_tags)
-                )
+        
+        verb_list = list(
+            map(lambda tup: tup[0],
+                filter(lambda tup: tup[1] == 'VERB', pos_tags)
             )
-            for verb in verb_list:
-                if verb in blacklist:
-                    self.removed_via_blacklist.add(verb)
-                    verb_list.remove(verb)
+        )
+        for verb in verb_list:
+            if verb in self.blacklist:
+                self.removed_via_blacklist.add(verb)
+                verb_list.remove(verb)
 
         return verb_list
 
