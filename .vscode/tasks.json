@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Website",
+            "type": "shell",
+            "command": "python3 web/app.py",
+            "problemMatcher": []
+        },
+        {
+            "label": "Process",
+            "type": "shell",
+            "command": "python3 process.py",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
