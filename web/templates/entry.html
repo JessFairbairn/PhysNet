@@ -12,7 +12,7 @@ Forms found:
         <li>{{form}}</li>
     {% endfor %}
 </ul>
-{% if data.condep %}
+<!-- {% if data.condep %}
 <h2>Conceptual Dependancies</h2>
 {{data.condep.primitive.name}} Event
 <div id="condep-diagram">
@@ -20,7 +20,7 @@ Forms found:
 
     </object>
 </div>
-{%endif%}
+{%endif%} -->
 
 <h2>Lexical Database Entries</h2>
 {% for sense in data.database_ids %}
@@ -66,6 +66,14 @@ Forms found:
         </dd>
         {%endif%}
     </dl>
+
+    {% if sense.synset %}
+    <div id="condep-diagram">
+      <object data="/svg/synset/{{sense.synset}}" type="image/svg+xml">
+  
+      </object>
+    </div>
+    {%endif%}
 
     {% if sense.hypernyms %}
     <h4>Hypernyms</h4>

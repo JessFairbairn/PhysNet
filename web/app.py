@@ -73,6 +73,25 @@ def get_condep_diagram(verb:str):
 
     return redirect(url_for('static', filename='cd-diagrams/'+ verb + '.svg'))
 
+@app.route('/svg/synset/<path:synpath>')
+def get_condep_diagram_for_synset(synpath:str):
+
+    synset = synpath.split('/')[0]
+    try:
+        verb = synpath.split('/')[1]
+    except IndexError:
+        verb = None
+
+    if not svg_service.SVGService.diagram_exists(synset):
+        condep = condep_service.get_condep_for_synset(synset, verb)
+        
+        if not condep:
+            return abort(404)
+
+        svg_service.SVGService.create_diagram(synset, condep)
+
+    return redirect(url_for('static', filename='cd-diagrams/'+ synset + '.svg'))
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
