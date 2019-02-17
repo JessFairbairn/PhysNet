@@ -21,12 +21,13 @@ class Processor:
     def __init__(self):
         print('Initialising...')
         #Parameters
-        self.corpus = "astro"
+        self.corpus = "full"
         self.max_score = 0.9
         self.min_score = 0.001
 
 
-        self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
+        # self.stemmer = SnowballStemmer("english") # Type: nltk.stem.api.StemmerI
+        self.lemmatizer = WordNetLemmatizer()
         self.spacy = spacy.load('en_core_web_lg')
 
         with open('blacklist.txt', 'r') as blacklist_file:
@@ -130,15 +131,15 @@ class Processor:
                     list_of_verbs = self._list_verbs(sentence)
 
                     local_verb_examples = dict(
-                        (self.stemmer.stem(verb).lower(), sentence) for verb in list_of_verbs)
+                        (self.lemmatizer.lemmatize(verb).lower(), sentence) for verb in list_of_verbs)
 
                     for verb in list_of_verbs:
 
-                        stemmed = self.stemmer.stem(verb).lower()
+                        stemmed = self.lemmatizer.lemmatize(verb).lower()
                         if stemmed in self.blacklist:
                             self.removed_via_blacklist.add(stemmed)
                             continue
-                            
+
                         try:
                             (stemmed_verb_instances[stemmed]).add(
                                 verb.lower())
@@ -178,8 +179,6 @@ class Processor:
     ):
         'Saves results to a JSON file'
 
-        lemmatizer = WordNetLemmatizer()
-
         new_dict = {}
         
         verbs_not_found = []
@@ -189,7 +188,7 @@ class Processor:
         not_physics_verb = []
 
         for verb in verb_examples:
-            stemmed_verb = self.stemmer.stem(verb)
+            stemmed_verb = self.lemmatizer.lemmatize(verb)
             try:
                 value = weights_df[weights_df.term == stemmed_verb].weight.values[0]
 
@@ -201,7 +200,7 @@ class Processor:
                 continue
 
             try:
-                lemm = lemmatizer.lemmatize(
+                lemm = self.lemmatizer.lemmatize(
                 next(iter(stemmed_verb_instances[stemmed_verb])),
                 pos='v')
             
