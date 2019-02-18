@@ -1,6 +1,7 @@
 dump*.xml
 process_log.json
 physics_articles.txt
+top_level_synsets.txt
 
 drafts/*
 verbnet/*
