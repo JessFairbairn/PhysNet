@@ -75,8 +75,8 @@ def _is_physics_class(themroles:list):
     if not themroles:
         raise ValueError('themroles list empty')
 
-    banned_roles = ['Beneficiary', 'Experiencer', 'Predicate', 'Value']
-    banned_selrests = ['organization', 'currency', 'animate', 'human']
+    banned_roles = ['Beneficiary', 'Experiencer', 'Predicate', 'Stimulus', 'Value']
+    banned_selrests = ['organization', 'currency', 'animate', 'human', 'animal', 'vehicle', 'body_part', 'garment', 'communication', 'comestible']
     
     for role in themroles:
         if role['type'] in banned_roles:
