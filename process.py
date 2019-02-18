@@ -131,11 +131,11 @@ class Processor:
                     list_of_verbs = self._list_verbs(sentence)
 
                     local_verb_examples = dict(
-                        (self.lemmatizer.lemmatize(verb).lower(), sentence) for verb in list_of_verbs)
+                        (self.lemmatizer.lemmatize(verb, pos='v').lower(), sentence) for verb in list_of_verbs)
 
                     for verb in list_of_verbs:
 
-                        stemmed = self.lemmatizer.lemmatize(verb).lower()
+                        stemmed = self.lemmatizer.lemmatize(verb, pos='v').lower()
                         if stemmed in self.blacklist:
                             self.removed_via_blacklist.add(stemmed)
                             continue
@@ -188,7 +188,7 @@ class Processor:
         not_physics_verb = []
 
         for verb in verb_examples:
-            stemmed_verb = self.lemmatizer.lemmatize(verb)
+            stemmed_verb = self.lemmatizer.lemmatize(verb, pos='v').lower()
             try:
                 value = weights_df[weights_df.term == stemmed_verb].weight.values[0]
 
@@ -202,7 +202,7 @@ class Processor:
             try:
                 lemm = self.lemmatizer.lemmatize(
                 next(iter(stemmed_verb_instances[stemmed_verb])),
-                pos='v')
+                pos='v').lower()
             
             except KeyError:
                 print('Missing: ', stemmed_verb)
