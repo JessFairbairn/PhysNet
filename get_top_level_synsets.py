@@ -8,7 +8,7 @@ directory = directory_service.get_verb_details() # Type: Dict
 children = dict()
 parent_lookup = dict()
 
-list_of_synsets = set()
+direct_synsets = set()
 synsets_with_hypernyms = set()
 
 for lemma, verb_data in directory.items():
@@ -17,7 +17,7 @@ for lemma, verb_data in directory.items():
         if not sense.synset:
             continue
 
-        list_of_synsets.add(sense.synset)
+        direct_synsets.add(sense.synset)
 
         
 
@@ -39,12 +39,22 @@ for lemma, verb_data in directory.items():
                 children[hypernym] = set([sense.synset])
 
 synsets_with_hyponyms = set(children.keys())
-top_level_synsets = list_of_synsets.difference(synsets_with_hypernyms)
+all_synsets = direct_synsets.union(synsets_with_hyponyms)
+top_level_synsets = all_synsets.difference(synsets_with_hypernyms)
 
 synsets_needing_cd = []
 for synset in top_level_synsets:
     
+    cd = condep_service.get_condep_for_synset(synset)
+
+    if cd:
+        continue
+
     verbs = directory_service.get_verbs_in_synset(synset)
+    if not verbs:
+        synsets_needing_cd.append(synset)
+        continue
+        
     for verb in verbs:
         cd = condep_service.get_condep_for_verb(verb)
         if cd:
