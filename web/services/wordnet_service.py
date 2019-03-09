@@ -3,7 +3,7 @@ import sys
 from nltk.corpus import wordnet as wn
 from nltk.corpus.reader.wordnet import WordNetError
 
-from web.services.verb_definition import SenseData
+from .verb_definition import SenseData
 
 def is_verb(lemm:str):
     lemmas = wn.lemmas(lemm, pos=wn.VERB)
@@ -54,6 +54,24 @@ def get_hypernyms(verb:SenseData):
         return [hypernyms[0].name()]
     except IndexError:
         return []
+
+def get_hypernyms_for_synset(synset:str):
+    try:
+        hypernyms = wn.synset(synset).hypernyms()
+        return hypernyms
+    except Exception as e:
+        print("Error getting hypernyms for ", synset, ': ', e)
+        return []
+
+    # if len(hypernyms) > 1:
+    #     print('Multiple hypernym synsets for verb: ', hypernyms)
+    
+    # try:
+    #     return [hypernyms[0].name()]
+    # except IndexError:
+    #     return []
+
+
 
 if '__main__' == __name__:
     verb = 'bisect'
