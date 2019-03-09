@@ -73,7 +73,7 @@ class SVGService:
             num_levels-1) * (SVGService.FONT_SIZE + SVGService.GAP_BETWEEN_LEVELS)
         obj_start_x, obj_width, actor_width = SVGService._draw_event(
             cd, svg_document, first_event_offset)
-        doc_width = obj_start_x + obj_width
+        doc_width = obj_start_x + obj_width + actor_width
 
         if cd.preceding:
             obj_start_x_pre, obj_width_pre, actor_width_pre = SVGService._draw_event(
@@ -87,8 +87,7 @@ class SVGService:
             SVGService._add_arrow(
                 svg_document,
                 (arrow_x, SVGService.FONT_SIZE + 5),
-                (arrow_x, SVGService.FONT_SIZE +
-                 SVGService.GAP_BETWEEN_LEVELS - 10),
+                (arrow_x, SVGService.FONT_SIZE + SVGService.GAP_BETWEEN_LEVELS - 10),
                 'r'
             )
 
@@ -111,6 +110,11 @@ class SVGService:
 
         actor_width = SVGService._text_width(actor_label, SVGService.FONT_SIZE)
 
+
+        # Write Primitive
+        if not cd.primitive:
+            return 0,0, actor_width
+
         # Add double arrow
         arrow_length = 60
 
@@ -120,7 +124,7 @@ class SVGService:
             (actor_width + 3, arrow_y_pos)
         )
 
-        # Write Primitive
+
         prim_text = svg_document.text(cd.primitive.name,
                                       insert=(actor_width + arrow_length + 6, SVGService.FONT_SIZE + y_offset))
 
@@ -257,6 +261,7 @@ class SVGService:
         except Exception:
             print('Cario not installed- estimating text width', file=sys.stderr)
             return 0.7 * len(text) * fontsize
+        # pylint: disable=no-member
         surface = cairo.SVGSurface('undefined.svg', 1280, 200)
         cr = cairo.Context(surface)
         cr.select_font_face('Arial', cairo.FONT_SLANT_NORMAL,
@@ -268,11 +273,7 @@ class SVGService:
 
 
 if __name__ == '__main__':
-    cd = CDDefinition(Primitives.MOVE)
-
-    cd.preceding = CDDefinitionPredecessorWrapper()
-
-    cd.preceding.definition = CDDefinition(Primitives.PTRANS)
+    cd = CDDefinition(Primitives.EXPEL)
 
     maker = SVGService()
     maker.create_diagram('test', cd)
