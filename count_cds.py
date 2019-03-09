@@ -27,4 +27,5 @@ for lemma, verb_data in directory.items():
         num_with_cds += 1
 
 fraction = num_with_cds/len(directory.keys())
+print('Number of verbs with CD definitions:', num_with_cds)
 print(str(fraction*100) + '%')
