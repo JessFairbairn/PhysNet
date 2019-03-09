@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<h2>{{set_name}}</h2>
+
 {% if verbs_in_set %}
 Verbs in synset:
 <ul>
@@ -15,5 +17,15 @@ Verbs in synset:
 No verbs in PhysNet for {{set_name}}
 {%endif%}
 
+{% if hyponyms == None %}
+Hyponyms not available...
+{% else %}
+<h3>Hyponyms</h3>
+<ul>
+    {% for hypo in hyponyms %}
+    <li><a href="/synsets/{{hypo}}">{{hypo}}</a></li>
+    {%endfor%}
+</ul>
+{% endif %}
 
 {% endblock %}

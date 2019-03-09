@@ -1,3 +1,4 @@
+import json
 import typing
 
 from web.services import directory_service
@@ -5,11 +6,21 @@ from web.services import condep_service
 
 directory = directory_service.get_verb_details() # Type: Dict
 
-children = dict()
+children_of_synsets = dict()
 parent_lookup = dict()
 
 direct_synsets = set()
 synsets_with_hypernyms = set()
+
+def _encode_for_json(obj):
+    if type(obj) == set:
+        return list(obj)
+        
+    output = obj.__dict__
+    for key, value in output.items():
+        if type(value) == set:
+            output[key] = list(value)
+    return output
 
 for lemma, verb_data in directory.items():
     for sense in verb_data.database_ids:
@@ -33,12 +44,12 @@ for lemma, verb_data in directory.items():
             
             synsets_with_hypernyms.add(sense.synset)
             
-            if hypernym in children.keys():
-                children[hypernym].add(sense.synset)
+            if hypernym in children_of_synsets.keys():
+                children_of_synsets[hypernym].add(sense.synset)
             else:
-                children[hypernym] = set([sense.synset])
+                children_of_synsets[hypernym] = set([sense.synset])
 
-synsets_with_hyponyms = set(children.keys())
+synsets_with_hyponyms = set(children_of_synsets.keys())
 all_synsets = direct_synsets.union(synsets_with_hyponyms)
 top_level_synsets = all_synsets.difference(synsets_with_hypernyms)
 
@@ -63,6 +74,13 @@ for synset in top_level_synsets:
     if not cd:
         synsets_needing_cd.append(synset)
 
+with open('web/static/children_of_synsets.json','w') as hypo_file:
+    
+    json.dump(children_of_synsets, hypo_file, default=_encode_for_json)
+
+
+
 with open('top_level_synsets.txt','w') as syn_file:
     
     syn_file.write('\n'.join(synsets_needing_cd))
+

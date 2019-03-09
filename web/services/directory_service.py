@@ -53,8 +53,20 @@ def calculate_verbs_in_synsets(synset:str):
     return verbs_in_synset
 
 def get_verbs_in_synset(synset:str):
+    assert type(synset) == str
+
     try:
         return _get_file_data()['synsets'][synset]
+    except KeyError:
+        return []
+
+def get_list_of_synsets():
+    return _get_file_data()['synsets']
+
+def get_hyponyms_of_synset(synset:str):
+    assert type(synset) == str
+    try:
+        return _get_hypo_data()[synset]
     except KeyError:
         return []
 
@@ -107,5 +119,11 @@ def _is_instance_of_class(dct:dict, class_to_check:type):
 def _get_file_data():
     static = _get_static_folder()
     with open(f"{static}/results.json", "r") as tempFile:
+        file_data = json.load(tempFile, object_hook=_decode_complex)
+        return file_data
+
+def _get_hypo_data():
+    static = _get_static_folder()
+    with open(f"{static}/children_of_synsets.json", "r") as tempFile:
         file_data = json.load(tempFile, object_hook=_decode_complex)
         return file_data
