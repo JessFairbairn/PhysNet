@@ -50,16 +50,22 @@ def verb_entry(verb:str):
     if not verb_info:
         return abort(404)
 
-    condep = condep_service.get_condep_for_verb(verb)
-    if condep:
-        verb_info.condep = condep
+    # condep = condep_service.get_condep_for_verb(verb)
+    # if condep:
+    #     verb_info.condep = condep
 
     return render_template('entry.html', verb=verb, data=verb_info)
+
+@app.route('/synsets')
+def synset_list():
+    synsets = directory_service.get_list_of_synsets()
+    return render_template('synset_list.html', synsets=synsets)
 
 @app.route('/synsets/<set_name>')
 def synset(set_name:str):
     verbs_in_set = directory_service.calculate_verbs_in_synsets(set_name)
-    return render_template('synset.html', set_name=set_name, verbs_in_set=verbs_in_set)
+    hyponyms = directory_service.get_hyponyms_of_synset(set_name)
+    return render_template('synset.html', set_name=set_name, verbs_in_set=verbs_in_set, hyponyms=hyponyms)
 
 @app.route('/svg/<verb>')
 def get_condep_diagram(verb:str):

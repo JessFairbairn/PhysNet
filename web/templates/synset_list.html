@@ -1,0 +1,18 @@
+{% extends "_base.html" %}
+{% block title %}Directory{% endblock %}
+
+
+{% block content %}
+
+<table>
+  <tr>
+    <th>Verb</th>
+  </tr>
+  {% for synset in synsets %}
+  <tr>
+    <td><a href="/synsets/{{synset}}">{{synset}}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
