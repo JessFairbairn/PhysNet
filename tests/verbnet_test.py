@@ -16,6 +16,11 @@ class VerbNetIdRetrievalTests(unittest.TestCase):
 
         self.assertEqual("break_down-45.8"  , data[0].verbnet)
 
+    def test_handle_dodgy_inheritance_issues(self):
+        data = verbnet_service.get_corpus_ids('appear')
+
+        self.assertEqual(2, len(data))
+
     def test_GetsIdFromSubgroupCorrectly(self):
         data = verbnet_service.get_corpus_ids('swallow')
 
