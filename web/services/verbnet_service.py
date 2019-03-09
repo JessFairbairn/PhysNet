@@ -99,7 +99,12 @@ def _get_themroles_for_class_id(class_id:str, fuse = 0):
         return themroles
     parent_id = '-'.join(id_components[0:-1])
 
-    themroles = themroles + _get_themroles_for_class_id(parent_id, fuse + 1)
+    try:
+        themroles = themroles + _get_themroles_for_class_id(parent_id, fuse + 1)
+    except ValueError:
+        parent_id = class_id.split('-')[0] + '-' + parent_id
+        themroles = themroles + _get_themroles_for_class_id(parent_id, fuse + 1)
+
 
     #TODO: need to actually override themroles from superclasses if there's a clash
     # themrole_types = list(map(lambda role: role['type'], themroles))
